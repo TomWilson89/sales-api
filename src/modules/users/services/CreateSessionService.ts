@@ -3,7 +3,7 @@ import AppError from '@shared/errors/AppError';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { getCustomRepository } from 'typeorm';
-import { UserRepository } from '../typeorm/repositories/UsersRepository';
+import { UserRepository } from '../infra/typeorm/repositories/UsersRepository';
 interface IRequest {
   email: string;
   password: string;

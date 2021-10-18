@@ -3,8 +3,8 @@ import AppError from '@shared/errors/AppError';
 import DiskStorageProvider from '@shared/providers/StorageProvider/DiskStorageProvider';
 import S3StorageProvider from '@shared/providers/StorageProvider/S3StorageProvider';
 import { getCustomRepository } from 'typeorm';
-import User from '../typeorm/entities/User';
-import { UserRepository } from '../typeorm/repositories/UsersRepository';
+import User from '../infra/typeorm/entities/User';
+import { UserRepository } from '../infra/typeorm/repositories/UsersRepository';
 
 interface IRequest {
   fileName: string;

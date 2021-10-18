@@ -4,8 +4,8 @@ import SESMail from '@config/mail/SESMail';
 import AppError from '@shared/errors/AppError';
 import path from 'path';
 import { getCustomRepository } from 'typeorm';
-import { UserRepository } from '../typeorm/repositories/UsersRepository';
-import { UserTokenRepository } from '../typeorm/repositories/UsersTokensRepository';
+import { UserRepository } from '../infra/typeorm/repositories/UsersRepository';
+import { UserTokenRepository } from '../infra/typeorm/repositories/UsersTokensRepository';
 
 interface IRequest {
   email: string;

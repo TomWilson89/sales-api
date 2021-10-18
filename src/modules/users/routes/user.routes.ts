@@ -6,7 +6,7 @@ import UserAvatarControler from '../controller/UsersAvatarController';
 import UserControler from '../controller/UsersController';
 import UserValidation from '../validation/UsersValidation';
 
-const multerConfig = multer(upload);
+const multerConfig = multer(upload.multer);
 
 const router = Router();
 

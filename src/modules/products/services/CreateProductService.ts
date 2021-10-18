@@ -1,4 +1,4 @@
-import RedisCache from '@shared/cache/RedisCache';
+import redisCache from '@shared/cache/RedisCache';
 import AppError from '@shared/errors/AppError';
 import { getCustomRepository } from 'typeorm';
 import Product from '../typeorm/entities/Product';
@@ -19,8 +19,6 @@ class CreateProductService {
     if (productExists) {
       throw new AppError('Product Already exists', 422);
     }
-
-    const redisCache = new RedisCache();
 
     const product = productsRepository.create({ name, price, quantity });
 

@@ -1,15 +1,17 @@
 import AppError from '@shared/errors/AppError';
-import bcrypt from 'bcryptjs';
 import { inject, injectable } from 'tsyringe';
 import { ICreateUser } from '../domain/models/ICreateUser';
 import { IUser } from '../domain/models/IUser';
 import { IUsersRepository } from '../domain/repositories/IUsersRepository';
+import { IHashProvider } from '../providers/HashProvider/models/IHashProvider';
 
 @injectable()
 class CreateUserService {
   constructor(
     @inject('UsersRepository')
     private usersRepository: IUsersRepository,
+    @inject('HashProvider')
+    private hashProvider: IHashProvider,
   ) {}
 
   public async execute({ email, name, password }: ICreateUser): Promise<IUser> {
@@ -23,7 +25,7 @@ class CreateUserService {
 
     const user = this.usersRepository.create({ name, email, password });
 
-    user.password = await bcrypt.hash(password, 12);
+    user.password = await this.hashProvider.generateHash(password);
 
     await this.usersRepository.save(user);
 

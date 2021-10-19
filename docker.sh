@@ -1,20 +1,16 @@
 #!/bin/bash
-docker run --name postgres -e POSTGRES_PASSWORD=docker -p 5432:5432 -d postgres
+# docker run --name postgres -e POSTGRES_PASSWORD=docker -p 5432:5432 -d postgres
 
 
-# docker stop $(docker ps -aq)
+docker stop $(docker ps -aq)
 
-# docker rm $(docker ps -aq)
+docker rm $(docker ps -aq)
 
-# docker rmi $(docker images -q)
+docker rmi $(docker images -q)
 
-# docker volume rm $(docker volume ls -q)
+docker volume rm $(docker volume ls -q)
 
 
-## Create migrations
-
-# yarn typeorm migration:create -n NameMigration
-# yarn typeorm migration:run
 
 
 ## REDIS

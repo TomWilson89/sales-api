@@ -1,16 +1,18 @@
 import config from '@config/auth';
 import AppError from '@shared/errors/AppError';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { inject, injectable } from 'tsyringe';
 import { ICreateSession } from '../domain/models/ICreateSession';
 import { IUserAuthenticated } from '../domain/models/IUserAuthenticated';
 import { IUsersRepository } from '../domain/repositories/IUsersRepository';
+import { IHashProvider } from '../providers/HashProvider/models/IHashProvider';
 @injectable()
 class CreateSessionService {
   constructor(
     @inject('UsersRepository')
     private usersRepository: IUsersRepository,
+    @inject('HashProvider')
+    private hashProvider: IHashProvider,
   ) {}
 
   public async execute({
@@ -25,7 +27,7 @@ class CreateSessionService {
       throw new AppError('Invalid Credentials', 401);
     }
 
-    const verify = await bcrypt.compare(password, user.password);
+    const verify = await this.hashProvider.compareHash(password, user.password);
 
     if (!verify) {
       throw new AppError('Invalid Credentials', 401);

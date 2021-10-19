@@ -2,20 +2,24 @@ import uploadConfig from '@config/upload';
 import AppError from '@shared/errors/AppError';
 import DiskStorageProvider from '@shared/providers/StorageProvider/DiskStorageProvider';
 import S3StorageProvider from '@shared/providers/StorageProvider/S3StorageProvider';
-import { getCustomRepository } from 'typeorm';
-import User from '../infra/typeorm/entities/User';
-import { UserRepository } from '../infra/typeorm/repositories/UsersRepository';
+import { inject, injectable } from 'tsyringe';
+import { IUpdateUserAvatar } from '../domain/models/IUpdateUserAvatar';
+import { IUser } from '../domain/models/IUser';
+import { IUsersRepository } from '../domain/repositories/IUsersRepository';
 
-interface IRequest {
-  fileName: string;
-  userId: string;
-}
-
+@injectable()
 class UpdateUserAvatarService {
-  public async execute({ fileName, userId }: IRequest): Promise<User> {
-    const usersRepository = getCustomRepository(UserRepository);
+  constructor(
+    @inject('UsersRepository')
+    private usersRepository: IUsersRepository,
+  ) {}
+  public async execute({
+    avatarFilename,
+    user_id,
+  }: IUpdateUserAvatar): Promise<IUser> {
+    // const usersRepository = getCustomRepository(UserRepository);
 
-    const user = await usersRepository.findById(userId);
+    const user = await this.usersRepository.findById(user_id);
 
     if (!user) {
       throw new AppError('User not found', 422);
@@ -26,18 +30,18 @@ class UpdateUserAvatarService {
         await S3StorageProvider.deleteFile(user.avatar);
       }
 
-      const file = await S3StorageProvider.saveFile(fileName);
+      const file = await S3StorageProvider.saveFile(avatarFilename);
       user.avatar = file;
     } else {
       if (user.avatar) {
         await DiskStorageProvider.deleteFile(user.avatar);
       }
 
-      const file = await DiskStorageProvider.saveFile(fileName);
+      const file = await DiskStorageProvider.saveFile(avatarFilename);
       user.avatar = file;
     }
 
-    await usersRepository.save(user);
+    await this.usersRepository.save(user);
 
     return user;
   }

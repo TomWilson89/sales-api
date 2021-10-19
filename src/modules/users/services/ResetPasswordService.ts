@@ -2,28 +2,33 @@ import AppError from '@shared/errors/AppError';
 import bcrypt from 'bcryptjs';
 import { isAfter } from 'date-fns';
 import addHours from 'date-fns/addHours';
-import { getCustomRepository } from 'typeorm';
-import { UserRepository } from '../infra/typeorm/repositories/UsersRepository';
-import { UserTokenRepository } from '../infra/typeorm/repositories/UsersTokensRepository';
+import { inject, injectable } from 'tsyringe';
+import { IResetPassword } from '../domain/models/IResetPassword';
+import { IUsersRepository } from '../domain/repositories/IUsersRepository';
+import { IUserTokensRepository } from '../domain/repositories/IUserTokensRepository';
 
-interface IRequest {
-  token: string;
-  password: string;
-}
-
+@injectable()
 class ResetPasswordService {
-  public async execute({ password, token }: IRequest): Promise<void> {
-    const usersRepository = getCustomRepository(UserRepository);
+  constructor(
+    @inject('UsersRepository')
+    private usersRepository: IUsersRepository,
 
-    const userTokensRepository = getCustomRepository(UserTokenRepository);
+    @inject('UserTokensRepository')
+    private userTokensRepository: IUserTokensRepository,
+  ) {}
 
-    const userToken = await userTokensRepository.findByToken(token);
+  public async execute({ password, token }: IResetPassword): Promise<void> {
+    // const usersRepository = getCustomRepository(UserRepository);
+
+    // const userTokensRepository = getCustomRepository(UserTokenRepository);
+
+    const userToken = await this.userTokensRepository.findByToken(token);
 
     if (!userToken) {
       throw new AppError('Invalid token');
     }
 
-    const user = await usersRepository.findById(userToken.user_id);
+    const user = await this.usersRepository.findById(userToken.user_id);
 
     if (!user) {
       throw new AppError('User does not exists');
@@ -39,7 +44,7 @@ class ResetPasswordService {
 
     user.password = await bcrypt.hash(password, 12);
 
-    await usersRepository.save(user);
+    await this.usersRepository.save(user);
   }
 }
 

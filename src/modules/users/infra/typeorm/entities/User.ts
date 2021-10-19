@@ -1,3 +1,4 @@
+import { IUser } from '@modules/users/domain/models/IUser';
 import { Exclude, Expose } from 'class-transformer';
 import {
   Column,
@@ -6,14 +7,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-export interface IUser {
-  id: string;
-  name: string;
-  avatar: string;
-  created_at: Date;
-  updated_at: Date;
-}
 
 @Entity('users')
 class User implements IUser {

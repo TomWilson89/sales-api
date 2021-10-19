@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 import CreateProductService from '../../../services/CreateProductService';
 import DeleteProductService from '../../../services/DeleteProductService';
 import ListProductService from '../../../services/ListProductService';
@@ -7,14 +8,16 @@ import UpdateProductService from '../../../services/UpdateProductService';
 
 class ProductsControllerClass {
   public async index(req: Request, res: Response): Promise<Response> {
-    const products = await new ListProductService().execute();
+    const products = await container.resolve(ListProductService).execute();
 
     return res.json({ data: products });
   }
 
   public async show(req: Request, res: Response): Promise<Response> {
     const { productId } = req.params;
-    const product = await new ShowProductService().execute({ id: productId });
+    const product = await container
+      .resolve(ShowProductService)
+      .execute({ id: productId });
 
     return res.json({ data: product });
   }
@@ -22,7 +25,7 @@ class ProductsControllerClass {
   public async create(req: Request, res: Response): Promise<Response> {
     const { name, price, quantity } = req.body;
 
-    const product = await new CreateProductService().execute({
+    const product = await container.resolve(CreateProductService).execute({
       name,
       price,
       quantity,
@@ -35,7 +38,7 @@ class ProductsControllerClass {
     const { name, price, quantity } = req.body;
     const { productId } = req.params;
 
-    const product = await new UpdateProductService().execute({
+    const product = await container.resolve(UpdateProductService).execute({
       id: productId,
       name,
       price,
@@ -48,7 +51,7 @@ class ProductsControllerClass {
   public async delete(req: Request, res: Response): Promise<Response> {
     const { productId } = req.params;
 
-    await new DeleteProductService().execute({
+    await container.resolve(DeleteProductService).execute({
       id: productId,
     });
 

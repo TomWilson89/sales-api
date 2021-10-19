@@ -1,13 +1,8 @@
-FROM node
+FROM node:alpine
+# FROM node:14.15.4-alipne3.12
 
-WORKDIR /app
+RUN apk add --no-cache bash
 
-COPY package.json .
+USER node
 
-RUN yarn
-
-COPY . .
-
-EXPOSE 4000
-
-CMD [ "yarn","start" ]
+WORKDIR /home/node/app

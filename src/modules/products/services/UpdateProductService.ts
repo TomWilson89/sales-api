@@ -1,35 +1,35 @@
 import redisCache from '@shared/cache/RedisCache';
 import AppError from '@shared/errors/AppError';
-import { getCustomRepository } from 'typeorm';
-import Product from '../typeorm/entities/Product';
-import { ProductRepository } from '../typeorm/repositories/ProductsRepository';
+import { inject, injectable } from 'tsyringe';
+import { IProduct } from '../domain/models/IProduct';
+import { IUpdateProduct } from '../domain/models/IUpdateProduct';
+import { IProductsRepository } from '../domain/repositories/IProductsRepository';
 
-interface IRequest {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-}
-
+@injectable()
 class UpdateProductService {
+  constructor(
+    @inject('ProductsRepository')
+    private productsRepository: IProductsRepository,
+  ) {}
+
   public async execute({
     id,
     name,
     price,
     quantity,
-  }: IRequest): Promise<Product> {
-    const productsRepository = getCustomRepository(ProductRepository);
+  }: IUpdateProduct): Promise<IProduct> {
+    // const productsRepository = getCustomRepository(ProductRepository);
 
-    const product = await productsRepository.findOne(id);
+    const product = await this.productsRepository.findById(id);
 
     if (!product) {
       throw new AppError('Product not found', 404);
     }
 
-    let productExists: Product | undefined;
+    let productExists: IProduct | undefined;
 
     if (product.name !== name) {
-      productExists = await productsRepository.findByName(name);
+      productExists = await this.productsRepository.findByName(name);
     }
 
     if (productExists) {
@@ -42,7 +42,7 @@ class UpdateProductService {
     product.price = price || product.price;
     product.quantity = quantity || product.quantity;
 
-    await productsRepository.save(product);
+    await this.productsRepository.save(product);
 
     return product;
   }
